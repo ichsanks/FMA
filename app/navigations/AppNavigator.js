@@ -3,7 +3,7 @@ import {
   reduxifyNavigator
 } from "react-navigation-redux-helpers";
 import { connect } from "react-redux";
-import Routes from "../config/routes";
+import Routes from "./Routes";
 
 const navMiddleware = createReactNavigationReduxMiddleware(
   "root",

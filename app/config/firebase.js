@@ -14,3 +14,7 @@ firebase.initializeApp(config);
 
 export const database = firebase.database();
 export const auth = firebase.auth();
+export const fauth = firebase.auth;
+export const cloudFunction = `https://us-central1-${
+  c.FIREBASE_PROJECT_ID
+}.cloudfunctions.net`;

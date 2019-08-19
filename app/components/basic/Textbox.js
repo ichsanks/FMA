@@ -33,14 +33,15 @@ const styles = StyleSheet.create({
     borderColor: "#e0e0e0"
   },
   input: {
-    paddingTop: 25,
-    paddingBottom: 10,
-    paddingHorizontal: 10,
-    fontSize: 16
+    paddingTop: 22,
+    paddingBottom: 5,
+    paddingHorizontal: 25,
+    fontSize: 16,
+    color: "#444444"
   },
   label: {
     position: "absolute",
-    left: 10,
+    left: 25,
     top: 5,
     color: "grey"
   }

@@ -1,5 +1,17 @@
 {
   "expo": {
-    "sdkVersion": "27.0.0"
+    "name": "Find My Asset",
+    "icon": "./app/assets/FMA.png",
+    "version": "1.7.1",
+    "slug": "find-my-asset",
+    "sdkVersion": "27.0.0",
+    "android": {
+      "versionCode": 10,
+      "package": "com.findmyasset",
+      "googleServicesFile": "./google-services.json"
+    },
+    "notification": {
+      "icon": "./app/assets/FMA-96.png"
+    }
   }
 }

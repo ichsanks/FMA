@@ -1,110 +1,139 @@
 import { AsyncStorage } from "react-native";
 import * as t from "./actionTypes";
 import * as api from "./api";
-import { fetchAssets } from "../assets/api";
+import { cameraAccess, registerPushNotification } from "../../services";
+import {
+  FETCH_LOCATIONS_SUCCESS,
+  FETCH_ASSETS_SUCCESS
+} from "../assets/actionTypes";
+import { fetchAssets, fetchLocations } from "../assets/api";
 import { NavigationActions } from "react-navigation";
 
-export const onChangeSignIn = ({ props, value }) => {
+export const onChangeSignInForm = ({ props, value }) => {
   return {
-    type: t.ON_CHANGE_SIGNIN,
+    type: t.ON_CHANGE_SIGNIN_FORM,
     payload: { props, value }
   };
 };
 
-const requestCamera = () => {
-  return dispatch => {
-    api.requestCamera();
+export const onChangePasswordForm = ({ props, value }) => {
+  return {
+    type: t.ON_CHANGE_PASSWORD_FORM,
+    payload: { props, value }
   };
-};
-
-const requestNotification = () => {
-  return dispatch => {
-    api.requestNotification(data).then(data => {
-      dispatch({ type: t.ASSIGN_NOTIFICATON_TOKEN, payload: data });
-    });
-  };
-};
-
-const fetchLocations = callback => {
-  return dispatch => {};
 };
 
 export const initialize = () => {
   return dispatch => {
-    fetchAssets();
-  };
-};
-
-/* export const signIn = (data, successCB, errorCB) => {
-  return dispatch => {
-    api.signIn(data, (success, data, error) => {
-      if (success) {
-        AsyncStorage.setItem("user", data).then(() =>
-          dispatch(NavigationActions.navigate({ routeName: "AssetList" }))
-        );
-      } else {
-        alert(error);
-      }
-    });
-  };
-};
-
-export const signOut = (successCB, errorCB) => {
-  return dispatch => {
-    api.signOut((success, data, error) => {
-      if (success) {
-        dispatch({ type: t.SIGN_OUT });
-        successCB();
-      } else if (error) {
-        errorCB(error);
-      }
-    });
-  };
-};
-
-export const checkLoginStatus = callback => {
-  return dispatch => {
-    auth.onAuthStateChanged(user => {
-      let isSignIn = user != null;
-
-      if (isSignIn) {
-        api.getUser(user, (success, { exists, user }, error) => {
-          if (success) {
-            if (exists) {
-              dispatch({ type: t.SIGN_IN, data: user });
-              callback(exists, isSignIn);
-            } else if (error) {
-              dispatch({ type: t.SIGN_OUT });
-              callback(false, false);
-            }
-          }
+    cameraAccess()
+      .then(() => {
+        registerPushNotification().then(token => {
+          dispatch({ type: t.REGISTER_PUSH_NOTIFICATION, payload: { token } });
+          AsyncStorage.getItem("auth")
+            .then(userdata => {
+              if (userdata) {
+                fetchLocations((success, data, error) => {
+                  if (success)
+                    dispatch({ type: FETCH_LOCATIONS_SUCCESS, payload: data });
+                });
+                fetchAssets(null, (success, data, error) => {
+                  if (success) {
+                    dispatch({
+                      type: FETCH_ASSETS_SUCCESS,
+                      payload: data
+                    });
+                    const routeName =
+                      JSON.parse(userdata).role === "admin"
+                        ? "AdminRoute"
+                        : "UserRoute";
+                    dispatch({
+                      type: t.SIGN_IN,
+                      payload: JSON.parse(userdata)
+                    });
+                    dispatch(NavigationActions.navigate({ routeName }));
+                  }
+                });
+              } else {
+                dispatch(
+                  NavigationActions.navigate({ routeName: "AuthRoutes" })
+                );
+              }
+            })
+            .catch(error => alert(error));
         });
-      } else {
-        dispatch({ type: t.SIGN_OUT });
-        callback(false, isSignIn);
-      }
-    });
+      })
+      .catch(error => alert(error));
   };
 };
 
-
-
-export const PasswordOnChange = () => {};
-
-export const checkLogin = errorCB => {
+export const signIn = logindata => {
   return dispatch => {
-    AsyncStorage.getItem("user", (error, result) => {
-      if (result) {
-        dispatch(NavigationActions.navigate({ routeName: "AssetList" }));
-        /* api.fetchAssets(location, (success, data, error) => {
-          if (success) {
-            dispatch({ type: t.FETCH_ASSETS_SUCCESS, payload: data });
-          } else if (error) errorCB(error);
-        });
-      } else {
-        this.props.navigation.navigate("SignIn");
-      }
+    api.isLogged(logindata.email, (success, login, error) => {
+      if (success) {
+        if (!login) {
+          api.signIn(logindata, (success, data, error) => {
+            const userdata = JSON.stringify(data);
+            if (success) {
+              AsyncStorage.setItem("auth", userdata)
+                .then(() => {
+                  fetchLocations((success, data, error) => {
+                    if (success)
+                      dispatch({
+                        type: FETCH_LOCATIONS_SUCCESS,
+                        payload: data
+                      });
+                  });
+                  fetchAssets(null, (success, data, error) => {
+                    if (success) {
+                      dispatch({
+                        type: FETCH_ASSETS_SUCCESS,
+                        payload: data
+                      });
+                      const routeName =
+                        JSON.parse(userdata).role === "admin"
+                          ? "AdminRoute"
+                          : "UserRoute";
+                      dispatch({
+                        type: t.SIGN_IN,
+                        payload: JSON.parse(userdata)
+                      });
+                      dispatch(NavigationActions.navigate({ routeName }));
+                    }
+                  });
+                })
+                .catch(error => alert(error));
+            } else if (error) alert(error);
+          });
+        } else
+          alert("This account has been used in another device. Please logout");
+      } else if (error) alert(error);
     });
   };
 };
- */
+
+export const signOut = uid => {
+  return dispatch => {
+    api.signOut(uid, (success, error) => {
+      if (success) {
+        AsyncStorage.clear();
+        dispatch({ type: t.SIGN_OUT });
+        dispatch(NavigationActions.navigate({ routeName: "Splash" }));
+      } else if (error) alert(error);
+    });
+  };
+};
+
+export const updatePassword = pass => {
+  return dispatch => {
+    api.validatePassword(pass, (success, error) => {
+      if (success) {
+        api.updatePassword(pass, (success, error) => {
+          if (success) {
+            dispatch({ type: t.RESET_PASSWORD_FORM });
+            dispatch(NavigationActions.navigate({ routeName: "Settings" }));
+          } else if (error) alert(error);
+        });
+      } else if (error) alert(error);
+    });
+  };
+};

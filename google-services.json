@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "142290875778",
+    "firebase_url": "https://find-my-asset.firebaseio.com",
+    "project_id": "find-my-asset",
+    "storage_bucket": "find-my-asset.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:142290875778:android:0e4dd0344c06d7f7",
+        "android_client_info": {
+          "package_name": "com.findmyasset"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "142290875778-06i0pirbkhf79m4g8m6i2bcmbdac4riu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB07yZcjMFL5lKlVn90vCZoGVqfTl01lYQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import { TouchableHighlight, Text } from "react-native";
-import { connect } from "react-redux";
-import { Container, HeaderButton } from "../../../components/basic";
+import { View, StyleSheet } from "react-native";
+import { Container, HeaderButtonIcon } from "../../../components/basic";
 import AssetForm from "../components/AssetForm";
-import { addAsset, onChangeAsset, resetAssetForm } from "../actions";
+import { connect } from "react-redux";
+import { addAsset, onChangeAssetForm, resetAssetForm } from "../actions";
 
 class AssetCreate extends Component {
   static navigationOptions = ({ navigation }) => {
@@ -11,45 +11,67 @@ class AssetCreate extends Component {
     return {
       title: "Add Asset",
       headerLeft: (
-        <HeaderButton title="Cancel" onPress={() => navigation.goBack()} />
+        <HeaderButtonIcon
+          iconName={`ios-arrow-back`}
+          onPress={() => navigation.goBack()}
+        />
       ),
       headerRight: (
-        <HeaderButton title="Add" onPress={() => params.handleSave()} />
+        <HeaderButtonIcon
+          iconName={`ios-send`}
+          onPress={() => params.handleSave()}
+        />
       )
     };
   };
 
   onSave = () => {
-    const { code, name, pic, location } = this.props;
-    this.props.addAsset({ code, name, pic, location });
+    const { code, name, pic, location, currFilterLocation } = this.props;
+    if (!code || !name || !pic || !location)
+      alert("Please fill all fields correctly");
+    else this.props.addAsset({ code, name, pic, location, currFilterLocation });
   };
 
   componentDidMount() {
     const item = this.props.navigation.getParam("item");
 
-    this.props.resetAssetForm();
     this.props.navigation.setParams({ handleSave: () => this.onSave() });
+    this.props.resetAssetForm();
 
-    for (let props in item) {
-      this.props.onChangeAsset({ props, value: item[props] });
+    if (item) {
+      for (let props in item) {
+        this.props.onChangeAssetForm({ props, value: item[props] });
+      }
     }
   }
 
   render() {
     return (
       <Container>
-        <AssetForm />
+        <View style={styles.container}>
+          <AssetForm editable={!this.props.loading} />
+        </View>
       </Container>
     );
   }
 }
 
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    marginTop: 20,
+    flexDirection: "column",
+    flexGrow: 1
+  }
+});
+
 const mapStateToProps = state => {
-  const { code, name, pic, location } = state.assetFormReducer;
-  return { code, name, pic, location };
+  const { currFilterLocation } = state.assetReducer;
+  const { code, name, location, pic, loading } = state.assetFormReducer;
+  return { code, name, location, pic, loading, currFilterLocation };
 };
 
 export default connect(
   mapStateToProps,
-  { addAsset, onChangeAsset, resetAssetForm }
+  { addAsset, onChangeAssetForm, resetAssetForm }
 )(AssetCreate);

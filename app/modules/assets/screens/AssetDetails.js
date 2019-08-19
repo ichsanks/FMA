@@ -1,8 +1,14 @@
 import React, { Component } from "react";
-import { Alert } from "react-native";
-import { connect } from "react-redux";
-import { Container, Button, HeaderButton } from "../../../components/basic";
+import { Alert, View, StyleSheet } from "react-native";
+import { Notifications } from "expo";
+import {
+  Container,
+  DeleteButton,
+  HeaderButtonIcon
+} from "../../../components/basic";
 import AssetForm from "../components/AssetForm";
+import BorrowState from "../components/BorrowState";
+import { connect } from "react-redux";
 import { onChangeAsset, deleteAsset } from "../actions";
 
 class AssetDetails extends Component {
@@ -10,20 +16,13 @@ class AssetDetails extends Component {
     return {
       title: "Asset Details",
       headerRight: (
-        <HeaderButton
+        <HeaderButtonIcon
+          iconName={`ios-create`}
           onPress={() => navigation.navigate("AssetEdit")}
-          title="Edit"
         />
       )
     };
   };
-
-  componentDidMount() {
-    const item = this.props.navigation.getParam("item");
-    for (let props in item) {
-      this.props.onChangeAsset({ props, value: item[props] });
-    }
-  }
 
   onDelete(code) {
     this.props.deleteAsset(code);
@@ -44,28 +43,47 @@ class AssetDetails extends Component {
     );
   }
 
-  renderDelete() {
-    return (
-      <Button
-        title="HAPUS"
-        onPress={() => this.confirmDelete(this.props.code)}
-      />
-    );
-  }
+  renderDeleteButton = () => {
+    if (
+      this.props.role === "admin" &&
+      (!this.props.borrow || !this.props.borrow.borrowState)
+    ) {
+      return (
+        <DeleteButton
+          title="HAPUS"
+          onPress={() => this.confirmDelete(this.props.code)}
+        />
+      );
+    }
+  };
 
   render() {
     return (
       <Container>
-        <AssetForm editable={false} />
-        {this.renderDelete()}
+        <View style={styles.container}>
+          <AssetForm editable={false} action="move" />
+          <BorrowState />
+          {this.renderDeleteButton()}
+        </View>
       </Container>
     );
   }
 }
 
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    marginTop: 20,
+    flexDirection: "column",
+    flexGrow: 1
+  }
+});
+
 const mapStateToProps = state => {
-  const { code, name, pic, location, status } = state.assetFormReducer;
-  return { code, name, pic, location, status };
+  const { code, name, pic, location, borrow } = state.assetFormReducer;
+  const username = state.authReducer.name;
+  const { role } = state.authReducer;
+  return { code, name, pic, location, username, role, borrow };
 };
 
 export default connect(

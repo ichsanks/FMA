@@ -1,3 +1,4 @@
+import React from "react";
 import {
   createBottomTabNavigator,
   createStackNavigator
@@ -11,7 +12,8 @@ import UserList from "../modules/users/screens/UserList";
 import UserCreate from "../modules/users/screens/UserCreate";
 import UserDetails from "../modules/users/screens/UserDetails";
 import Settings from "../modules/auth/screens/Settings";
-import { HeaderButton } from "../components/basic";
+import ChangePassword from "../modules/auth/screens/ChangePassword";
+import { HeaderButtonIcon } from "../components/basic";
 
 const Tab = { AssetList, Scanner, UserList, Settings };
 
@@ -26,8 +28,7 @@ const TabNavigatorConfig = {
 const StackNavigatorConfig = {
   navigationOptions: {
     headerStyle: {
-      backgroundColor: "#00adbb",
-      paddingHorizontal: 5
+      backgroundColor: "#00adbb"
     },
     headerTitleStyle: {
       alignSelf: "center"
@@ -43,38 +44,39 @@ TabRoutes.navigationOptions = ({ navigation }) => {
   switch (routeName) {
     case "AssetList":
       return {
-        title: "Asset",
-        headerTitleStyle: {
-          textAlign: "center",
-          alignSelf: "center"
-        }
+        title: "Assets",
+        headerRight: (
+          <HeaderButtonIcon
+            iconName={`ios-add`}
+            onPress={() => navigation.navigate("AssetCreate")}
+          />
+        )
       };
     case "UserList":
       return {
         title: "Users",
-        headerTitleStyle: {
-          textAlign: "center",
-          alignSelf: "center"
-        }
-      }
+        headerRight: (
+          <HeaderButtonIcon
+            iconName={`ios-add`}
+            onPress={() => navigation.navigate("UserCreate")}
+          />
+        )
+      };
+    case "Scanner":
+      return { title: "Scanner" };
     case "Settings":
-      return {
-        title: "Settings",
-        headerTitleStyle: {
-          textAlign: "center",
-          alignSelf: "center"
-        }
-      }
+      return { title: "Settings" };
   }
 };
 
 const Stack = {
-  TabRoutes,  
-  AssetDetails,
+  TabRoutes,
   AssetCreate,
+  AssetDetails,
   AssetEdit,
   UserDetails,
-  UserCreate
+  UserCreate,
+  ChangePassword
 };
 
 const AdminRoutes = createStackNavigator(Stack, StackNavigatorConfig);

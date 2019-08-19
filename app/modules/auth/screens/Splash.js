@@ -1,19 +1,12 @@
 import React, { Component } from "react";
-import { View, StyleSheet, AsyncStorage } from "react-native";
+import { View, StyleSheet } from "react-native";
 import Logo from "../components/logo";
 import { connect } from "react-redux";
-import { fetchAssets } from "../../assets/actions";
+import { initialize } from "../actions";
 
 class Splash extends Component {
-  componentDidMount() {
+  async componentDidMount() {
     this.props.initialize();
-    /* AsyncStorage.getItem("user", (error, result) => {
-      if (result) {
-        this.props.navigation.navigate("AssetList");
-      } else {
-        this.props.navigation.navigate("SignIn");
-      }
-    }); */
   }
 
   render() {
@@ -34,12 +27,10 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => {
-  return {
-    assets: state.assetReducer
-  };
+  return state;
 };
 
 export default connect(
   mapStateToProps,
-  { fetchAssets }
+  { initialize }
 )(Splash);

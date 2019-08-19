@@ -1,37 +1,62 @@
-import { AsyncStorage } from "react-native";
 import * as t from "./actionTypes";
 
-let initialState = { isSignIn: false, user: null };
+let InitialState = {
+  isSignIn: false,
+  uid: "",
+  username: "",
+  email: "",
+  role: "",
+  token: null
+};
 
-let initialFormState = {
+let InitialFormState = {
   email: "",
   password: "",
   isLoading: false
 };
 
-export const authReducer = (state = initialState, action) => {
+let InitialPasswordFormState = {
+  currPassword: "",
+  newPassword: "",
+  confPassword: ""
+};
+
+export const authReducer = (state = InitialState, action) => {
   switch (action.type) {
     case t.SIGN_IN:
-      const user = action.data;
-      AsyncStorage.multiSet([["user", JSON.stringify(user)]]);
-      return { ...state, isSignIn: true, user: user };
-
+      const { uid, name, email, role } = action.payload;
+      return { ...state, isSignIn: true, uid, username: name, email, role };
+    case t.REGISTER_PUSH_NOTIFICATION:
+      const { token } = action.payload;
+      return { ...state, token };
     case t.SIGN_OUT:
-      let keys = ["user"];
-      AsyncStorage.multiRemove(keys);
-      return { ...state, isSignIn: false, user: null };
-
+      return InitialState;
     default:
       return state;
   }
 };
 
-export const authFormReducer = (state = initialFormState, action) => {
+export const authFormReducer = (state = InitialFormState, action) => {
   switch (action.type) {
-    case t.ON_CHANGE_SIGNIN:
+    case t.ON_CHANGE_SIGNIN_FORM:
       return { ...state, [action.payload.props]: action.payload.value };
     case t.RESET_AUTH_FORM:
-      return initialFormState;
+    case t.SIGN_OUT:
+      return InitialFormState;
+    default:
+      return state;
+  }
+};
+
+export const passwordFormReducer = (
+  state = InitialPasswordFormState,
+  action
+) => {
+  switch (action.type) {
+    case t.ON_CHANGE_PASSWORD_FORM:
+      return { ...state, [action.payload.props]: action.payload.value };
+    case t.SIGN_OUT:
+      return InitialPasswordFormState;
     default:
       return state;
   }

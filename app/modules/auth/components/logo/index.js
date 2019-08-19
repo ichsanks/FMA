@@ -5,7 +5,7 @@ const Logo = () => (
   <Image
     resizeMode="contain"
     style={styles.logo}
-    source={require("./FMA.jpeg")}
+    source={require("../../../../assets/FMA.png")}
   />
 );
 
